@@ -12,7 +12,7 @@ const Home = () => {
       <S.Content>
         <S.Header>
           <Text size="64px" bold>
-            PplFinder
+            People Finder
           </Text>
         </S.Header>
         <UserList users={users} isLoading={isLoading} />
