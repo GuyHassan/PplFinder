@@ -64,7 +64,6 @@ const UserList = ({ users, isLoading, loadMorePpl, countries }) => {
       </S.Filters>
       <S.List >
         {applyCountriesFilters().map((user, index) => {
-          console.log(index);
           if (users.length === index + 1) {
             return <div ref={lastPplElementRef}>
               <User
