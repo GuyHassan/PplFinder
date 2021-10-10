@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import Text from "components/Text";
+import React, { useState, useRef, useCallback } from "react";
 import Spinner from "components/Spinner";
 import CheckBox from "components/CheckBox";
-import IconButton from "@material-ui/core/IconButton";
-import FavoriteIcon from "@material-ui/icons/Favorite";
 import * as S from "./style";
+import { useFavorites } from "hooks/useFavorites";
+import User from "./User";
 
-const UserList = ({ users, isLoading }) => {
+const UserList = ({ users, isLoading, loadMorePpl, countries }) => {
   const [hoveredUserId, setHoveredUserId] = useState();
-
+  const [countriesFilter, setCountiesFilter] = useState({})
+  const { toggleFavorite, isFavorite, favorites } = useFavorites();
   const handleMouseEnter = (index) => {
     setHoveredUserId(index);
   };
@@ -17,42 +17,79 @@ const UserList = ({ users, isLoading }) => {
     setHoveredUserId();
   };
 
+  // add to countriesFilter flag who is clicked, and remove when re click
+  const handleSetFilter = (country) => {
+    const { [country]: currentFilterState, ...restOfTheFilters } = countriesFilter;
+
+    if (currentFilterState) {
+      setCountiesFilter(restOfTheFilters);
+      return
+    }
+    setCountiesFilter(p => ({ ...p, [country]: true }))
+
+  }
+
+  // when the user selected one of country from the checkbox
+  const applyCountriesFilters = () => {
+    if (!Object.keys(countriesFilter).length)
+      return users;
+    return users.filter(user => countriesFilter[user.location.country])
+  }
+
+  // itersection observer, infinite scroll logics
+  const observer = useRef();
+  const lastPplElementRef = useCallback(node => {
+    if (isLoading) return
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        loadMorePpl && loadMorePpl()
+      }
+    })
+    if (node) observer.current.observe(node)
+
+  }, [isLoading])
+
   return (
     <S.UserList>
       <S.Filters>
-        <CheckBox value="BR" label="Brazil" />
-        <CheckBox value="AU" label="Australia" />
-        <CheckBox value="CA" label="Canada" />
-        <CheckBox value="DE" label="Germany" />
+        {countries.map(country =>
+          <CheckBox
+            value={country}
+            label={country}
+            key={country}
+            isChecked={countriesFilter[country]}
+            onChange={() => handleSetFilter(country)}
+          />)}
       </S.Filters>
-      <S.List>
-        {users.map((user, index) => {
-          return (
-            <S.User
+      <S.List >
+        {applyCountriesFilters().map((user, index) => {
+          console.log(index);
+          if (users.length === index + 1) {
+            return <div ref={lastPplElementRef}>
+              <User
+                user={user}
+                index={index}
+                key={index}
+                toggleFavorite={toggleFavorite}
+                isFavorite={isFavorite}
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+                hoveredUserId={hoveredUserId}
+
+              /></div>
+          } else {
+            return <User
+              user={user}
+              index={index}
               key={index}
-              onMouseEnter={() => handleMouseEnter(index)}
-              onMouseLeave={handleMouseLeave}
-            >
-              <S.UserPicture src={user?.picture.large} alt="" />
-              <S.UserInfo>
-                <Text size="22px" bold>
-                  {user?.name.title} {user?.name.first} {user?.name.last}
-                </Text>
-                <Text size="14px">{user?.email}</Text>
-                <Text size="14px">
-                  {user?.location.street.number} {user?.location.street.name}
-                </Text>
-                <Text size="14px">
-                  {user?.location.city} {user?.location.country}
-                </Text>
-              </S.UserInfo>
-              <S.IconButtonWrapper isVisible={index === hoveredUserId}>
-                <IconButton>
-                  <FavoriteIcon color="error" />
-                </IconButton>
-              </S.IconButtonWrapper>
-            </S.User>
-          );
+              toggleFavorite={toggleFavorite}
+              isFavorite={isFavorite}
+              handleMouseEnter={handleMouseEnter}
+              handleMouseLeave={handleMouseLeave}
+              hoveredUserId={hoveredUserId}
+            />
+          }
         })}
         {isLoading && (
           <S.SpinnerWrapper>
