@@ -8,7 +8,7 @@ const Home = () => {
   const { users, isLoading, fetchUsers } = usePeopleFetch();
   const [usersList, setUsersList] = useState([]);
 
-  // every render i calculate the countries again
+  // every render i recalculate the countries again
   const getUniqueUsersCountries = (user) => user.location.country;
   const countries = new Set(users.map(v => getUniqueUsersCountries(v)).slice(0, 7));
 

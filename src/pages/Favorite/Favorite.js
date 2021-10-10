@@ -7,7 +7,7 @@ import { useFavorites } from 'hooks/useFavorites';
 const Favorite = () => {
     const { favorites } = useFavorites();
 
-    // every render i calculate the countries again
+    // every render i recalculate the countries again
     const getUniqueUsersCountries = (user) => user.location.country;
     const countries = new Set(favorites.map(v => getUniqueUsersCountries(v)))
 
