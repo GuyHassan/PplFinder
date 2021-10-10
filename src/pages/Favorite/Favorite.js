@@ -1,23 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import * as S from "../Home/style";
 import Text from "components/Text";
 import UserList from 'components/UserList/index';
 import { useFavorites } from 'hooks/useFavorites';
 
 const Favorite = () => {
-    const [countries, setCountries] = useState(new Set());
     const { favorites } = useFavorites();
 
-    useEffect(() => {
-        setCountries(prev => {
-            favorites.forEach(favorite => {
-                prev.add(favorite.location.country);
-            })
-            return new Set(prev);
-        })
-    }, [])
-    return (
+    // every render i calculate the countries again
+    const getUniqueUsersCountries = (user) => user.location.country;
+    const countries = new Set(favorites.map(v => getUniqueUsersCountries(v)))
 
+    return (
         <S.Home>
             <S.Content>
                 <S.Header>

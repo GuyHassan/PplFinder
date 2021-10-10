@@ -1,46 +1,23 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useContext } from 'react';
+import { FavoritesContext } from '../Context/FavoritesContext';
 
 export const useFavorites = () => {
-    const [favorites, setFavorites] = useState(() => {
-        const favortiteUsers = localStorage.getItem('favoriteUsers');
-        if (favortiteUsers) {
-            return JSON.parse(favortiteUsers)
-        }
-        return {}
-    });
+    
+    const { favorites, setFavorites } = useContext(FavoritesContext);
 
-    const addToFavorites = (user) => {
-        setFavorites(prevFavorites => ({ ...prevFavorites, [getUserId(user)]: user }));
-    }
+    const isFavorite = (user) => !!favorites[getUserId(user)];
 
-    const deleteFromFavorites = (user) => {
-        setFavorites(prevFavorites => {
-            const { [getUserId(user)]: toDelete, ...restOfTheFavorites } = prevFavorites;
-            return restOfTheFavorites;
-        });
-
-    }
-
-    const isFavorite = (user) => {
-        return !!favorites[getUserId(user)];
-    }
+    const getUserId = (user) => user.login.uuid;
 
     const toggleFavorite = (user) => {
-        if (isFavorite(user)) {
-            deleteFromFavorites(user);
-            return
-        }
-        addToFavorites(user);
+        setFavorites(prevFavorites => {
+            const { [getUserId(user)]: targetUser, ...restOfTheFavorites } = prevFavorites;
+            // If the user existed, then delete
+            if (targetUser) return restOfTheFavorites
+            // add new user to localstorage
+            return { ...prevFavorites, [getUserId(user)]: user };
+        });
     }
-
-    const getUserId = (user) => {
-        return user.login.uuid;
-    }
-
-    useEffect(() => {
-        localStorage.setItem('favoriteUsers', JSON.stringify(favorites))
-    }, [favorites])
 
     return { toggleFavorite, isFavorite, favorites: Object.values(favorites) };
 }

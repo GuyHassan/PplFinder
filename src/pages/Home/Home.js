@@ -7,19 +7,13 @@ import * as S from "./style";
 const Home = () => {
   const { users, isLoading, fetchUsers } = usePeopleFetch();
   const [usersList, setUsersList] = useState([]);
-  const [countries, setCountries] = useState(new Set())
+
+  // every render i calculate the countries again
+  const getUniqueUsersCountries = (user) => user.location.country;
+  const countries = new Set(users.map(v => getUniqueUsersCountries(v)).slice(0, 7));
 
   useEffect(() => {
     setUsersList(users)
-  }, [users])
-
-  useEffect(() => {
-    setCountries(prev => {
-      users.forEach(user => {
-        prev.add(user.location.country);
-      })
-      return new Set(Array.from(prev).slice(0, 7));
-    })
   }, [users])
 
   return (
@@ -36,7 +30,6 @@ const Home = () => {
           countries={Array.from(countries)}
           loadMorePpl={fetchUsers} />
       </S.Content>
-
     </S.Home>
   );
 };
