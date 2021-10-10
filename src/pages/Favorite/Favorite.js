@@ -9,7 +9,7 @@ const Favorite = () => {
 
     // every render i recalculate the countries again
     const getUniqueUsersCountries = (user) => user.location.country;
-    const countries = new Set(favorites.map(v => getUniqueUsersCountries(v)))
+    const countries = new Set(favorites.map(v => getUniqueUsersCountries(v)).slice(0, 7))
 
     return (
         <S.Home>
