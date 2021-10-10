@@ -8,7 +8,7 @@ import User from "./User";
 const UserList = ({ users, isLoading, loadMorePpl, countries }) => {
   const [hoveredUserId, setHoveredUserId] = useState();
   const [countriesFilter, setCountiesFilter] = useState({})
-  const { toggleFavorite, isFavorite, favorites } = useFavorites();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const handleMouseEnter = (index) => {
     setHoveredUserId(index);
   };
@@ -17,7 +17,7 @@ const UserList = ({ users, isLoading, loadMorePpl, countries }) => {
     setHoveredUserId();
   };
 
-  // add to countriesFilter flag who is clicked, and remove when re click
+  // add to countriesFilter flag who is clicked, and remove when reclick
   const handleSetFilter = (country) => {
     const { [country]: currentFilterState, ...restOfTheFilters } = countriesFilter;
 
@@ -29,7 +29,7 @@ const UserList = ({ users, isLoading, loadMorePpl, countries }) => {
 
   }
 
-  // when the user selected one of country from the checkbox
+  // when the user selected one of countries from the checkbox
   const applyCountriesFilters = () => {
     if (!Object.keys(countriesFilter).length)
       return users;
