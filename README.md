@@ -1,5 +1,7 @@
 # Ppl Finder
 
+My Project: https://guyhassan.github.io/PplFinder/
+
 Welcome to the Ppl Finder application.
 This app is a simple application which displays randomly generated user information in a list, using the `randomuser.me` API.
 
